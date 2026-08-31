@@ -17,7 +17,7 @@
   },
   "scripts": {
     "dev": "electron-vite dev",
-    "build": "electron-vite build && npm run copy:main-assets",
+    "build": "node --max-old-space-size=4096 node_modules/electron-vite/bin/electron-vite.js build && npm run copy:main-assets",
     "copy:main-assets": "node tools/copy-main-assets.cjs",
     "preview": "electron-vite preview",
     "postinstall": "electron-rebuild -f && node tools/ensure-pty-perms.cjs && node tools/patch-node-pty-conpty.cjs && node tools/patch-tunnelmole-metadata.cjs",
