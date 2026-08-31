@@ -13,32 +13,38 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const ts = require('typescript');
+const { parse } = require('@babel/parser');
 
 const sourcePath = path.join(__dirname, '..', 'src', 'main', 'index.ts');
 
 function property(object, name) {
   return object.properties.find((entry) => (
-    ts.isPropertyAssignment(entry)
-    && ((ts.isIdentifier(entry.name) && entry.name.text === name)
-      || (ts.isStringLiteral(entry.name) && entry.name.text === name))
+    entry.type === 'ObjectProperty'
+    && ((entry.key.type === 'Identifier' && entry.key.name === name)
+      || (entry.key.type === 'StringLiteral' && entry.key.value === name))
   ));
 }
 
 function browserWindowOptions() {
   const text = fs.readFileSync(sourcePath, 'utf8');
-  const source = ts.createSourceFile(sourcePath, text, ts.ScriptTarget.Latest, true);
+  const source = parse(text, { sourceType: 'module', plugins: ['typescript', 'jsx'] });
   const windows = [];
 
   function visit(node) {
     if (
-      ts.isNewExpression(node)
-      && ts.isIdentifier(node.expression)
-      && node.expression.text === 'BrowserWindow'
+      node.type === 'NewExpression'
+      && node.callee.type === 'Identifier'
+      && node.callee.name === 'BrowserWindow'
     ) {
       windows.push(node.arguments?.[0]);
     }
-    ts.forEachChild(node, visit);
+    for (const value of Object.values(node)) {
+      if (Array.isArray(value)) {
+        for (const child of value) if (child?.type) visit(child);
+      } else if (value?.type) {
+        visit(value);
+      }
+    }
   }
 
   visit(source);
@@ -50,14 +56,15 @@ test('every BrowserWindow explicitly enables the Chromium renderer sandbox', () 
   assert.ok(windows.length > 0, 'no BrowserWindow construction found');
 
   for (const options of windows) {
-    assert.ok(options && ts.isObjectLiteralExpression(options), 'BrowserWindow options must be literal');
+    assert.equal(options?.type, 'ObjectExpression', 'BrowserWindow options must be literal');
     const webPreferences = property(options, 'webPreferences');
     assert.ok(
-      webPreferences && ts.isObjectLiteralExpression(webPreferences.initializer),
+      webPreferences && webPreferences.value.type === 'ObjectExpression',
       'BrowserWindow webPreferences must be literal'
     );
-    const sandbox = property(webPreferences.initializer, 'sandbox');
+    const sandbox = property(webPreferences.value, 'sandbox');
     assert.ok(sandbox, 'BrowserWindow must declare sandbox explicitly');
-    assert.equal(sandbox.initializer.kind, ts.SyntaxKind.TrueKeyword);
+    assert.equal(sandbox.value.type, 'BooleanLiteral');
+    assert.equal(sandbox.value.value, true);
   }
 });

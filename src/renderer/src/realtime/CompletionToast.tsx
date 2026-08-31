@@ -16,7 +16,7 @@
  *
  * Branch feat/realtime-michael. See board.md "🎙 REALTIME MICHAEL".
  */
-import { useEffect, useRef, useState } from 'react';
+import { type JSX, useEffect, useRef, useState } from 'react';
 import { Icon } from '@/components/Icon';
 import { useStore } from '@/store/store';
 

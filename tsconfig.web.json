@@ -14,11 +14,10 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "types": ["vite/client"],
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/renderer/src/*"],
-      "@brand/*": ["docs/*"],
-      "@shared/*": ["src/shared/*"]
+      "@/*": ["./src/renderer/src/*"],
+      "@brand/*": ["./docs/*"],
+      "@shared/*": ["./src/shared/*"]
     }
   },
   "include": ["src/renderer/**/*", "src/preload/index.d.ts", "src/shared/**/*"]

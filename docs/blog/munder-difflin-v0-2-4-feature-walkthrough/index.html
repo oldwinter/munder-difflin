@@ -220,7 +220,7 @@
 <li><strong>Startup failure surfaces as a real error.</strong> If tunnelmole fails to bind or returns no URL, the app now logs an actionable error instead of silently reporting a successful (but broken) start.</li>
 <li><strong>The URL is stable per session.</strong> tunnelmole’s URL is the actual address Slack or an external system should call — no browser challenge before the POST lands.</li>
 </ol>
-<p>If you had a saved Slack webhook URL pointing at a <a href="http://loca.lt">loca.lt</a> address, update it to the new tunnelmole URL after the upgrade. The app will surface the correct address on startup.</p>
+<p>If you had a saved Slack webhook URL pointing at a loca.lt address, update it to the new tunnelmole URL after the upgrade. The app will surface the correct address on startup.</p>
 <h2 id="windows-spawn-fix" tabindex="-1">Windows spawn fix <a class="anchor" href="#windows-spawn-fix" aria-hidden="true">#</a></h2>
 <p>Windows agent spawn has been iteratively improved across the v0.1.x and v0.2.x releases — from the original ENOENT binary-resolution fix in v0.1.8 to the lock-screen freeze fix in v0.2.0. A further Windows spawn fix (#22) addresses a specific spawn failure path for GOD orchestrator startup on Windows. If you were seeing GOD fail to initialize on Windows in previous builds, this release resolves it.</p>
 <h2 id="dismiss-on-task-board-cards" tabindex="-1">Dismiss (✕) on task-board cards <a class="anchor" href="#dismiss-on-task-board-cards" aria-hidden="true">#</a></h2>

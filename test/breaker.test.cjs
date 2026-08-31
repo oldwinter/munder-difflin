@@ -2,8 +2,7 @@
 /**
  * Circuit-breaker policy tests. Self-contained, no test framework — run with
  * `node test/breaker.test.cjs` (mirrors test/agent-provider.test.cjs). breaker.ts
- * only has type-only imports, so it transpiles standalone with the bundled
- * `typescript` compiler.
+ * only has type-only imports, so it transpiles standalone.
  *
  * Focus: the no-progress false-positive fixes (upstream issue #109 + fleet
  * evidence — compaction / inbox-ack bursts and background work tripping
@@ -21,13 +20,11 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const ts = require('typescript');
+const { transpileTs } = require('./transpile-ts.cjs');
 
 const SRC = path.join(__dirname, '..', 'src', 'main', 'breaker.ts');
 const out = fs.mkdtempSync(path.join(os.tmpdir(), 'breaker-'));
-const js = ts.transpileModule(fs.readFileSync(SRC, 'utf8'), {
-  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 }
-}).outputText;
+const js = transpileTs(fs.readFileSync(SRC, 'utf8'), SRC);
 fs.writeFileSync(path.join(out, 'breaker.js'), js, 'utf8');
 const { CircuitBreaker } = require(path.join(out, 'breaker.js'));
 

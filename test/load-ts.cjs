@@ -2,7 +2,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const ts = require('typescript');
+const { transpileTs } = require('./transpile-ts.cjs');
 
 const cache = new Map();
 
@@ -28,27 +28,7 @@ function loadFile(filename) {
     return json.exports;
   }
   const source = fs.readFileSync(filename, 'utf8');
-  const output = ts.transpileModule(source, {
-    compilerOptions: {
-      module: ts.ModuleKind.CommonJS,
-      target: ts.ScriptTarget.ES2022,
-      strict: true,
-      // Match tsconfig.node/tsconfig.web. Without it a default import of a CJS
-      // builtin (`import path from 'node:path'`) compiles to `path_1.default`,
-      // which is undefined at run time — the module loads fine and then explodes
-      // on first use. Test harness only; no shipped code compiles through here.
-      esModuleInterop: true
-    },
-    fileName: filename,
-    reportDiagnostics: true
-  });
-  if (output.diagnostics?.length) {
-    throw new Error(ts.formatDiagnosticsWithColorAndContext(output.diagnostics, {
-      getCurrentDirectory: () => process.cwd(),
-      getCanonicalFileName: (name) => name,
-      getNewLine: () => '\n'
-    }));
-  }
+  const output = transpileTs(source, filename);
   const mod = { exports: {} };
   cache.set(filename, mod);
   const localRequire = (request) => {
@@ -58,7 +38,7 @@ function loadFile(filename) {
     }
     return require(request);
   };
-  const run = new Function('module', 'exports', 'require', '__filename', '__dirname', output.outputText);
+  const run = new Function('module', 'exports', 'require', '__filename', '__dirname', output);
   run(mod, mod.exports, localRequire, filename, path.dirname(filename));
   return mod.exports;
 }
