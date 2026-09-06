@@ -3,8 +3,8 @@
  * Agent-provider registry tests. Self-contained, no test framework — run with
  * `node test/agent-provider.test.cjs` (mirrors test/kg-core.test.cjs). The
  * registry lives in TypeScript (src/shared/agentProvider.ts), so we transpile it
- * and its two dependency-free command-group siblings with the bundled `typescript`
- * compiler into a temp dir and require the result. Exercises the copilot preset
+ * and its two dependency-free command-group siblings into a temp dir and require
+ * the result. Exercises the copilot preset
  * (GitHub Copilot CLI) end to end: registration, command inference, the print-mode
  * flag shape, and the model/resume passthrough — alongside the pre-existing codex
  * preset as a guard against regressions.
@@ -14,15 +14,13 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const ts = require('typescript');
+const { transpileTs } = require('./transpile-ts.cjs');
 
 const SHARED = path.join(__dirname, '..', 'src', 'shared');
 const out = fs.mkdtempSync(path.join(os.tmpdir(), 'agentprov-'));
 for (const name of ['claudeCommands', 'codexCommands', 'grokCommands', 'agentProvider']) {
   const src = fs.readFileSync(path.join(SHARED, `${name}.ts`), 'utf8');
-  const js = ts.transpileModule(src, {
-    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 }
-  }).outputText;
+  const js = transpileTs(src, path.join(SHARED, `${name}.ts`));
   fs.writeFileSync(path.join(out, `${name}.js`), js, 'utf8');
 }
 const ap = require(path.join(out, 'agentProvider.js'));

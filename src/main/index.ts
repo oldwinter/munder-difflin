@@ -1,4 +1,4 @@
-import { app, BrowserWindow, clipboard, dialog, ipcMain, Menu, powerMonitor, powerSaveBlocker, screen, shell, Notification } from 'electron';
+import { app, BrowserWindow, clipboard, dialog, ipcMain, Menu, nativeImage, powerMonitor, powerSaveBlocker, screen, shell, Notification } from 'electron';
 import { spawn } from 'node:child_process';
 import {
   rmSync, existsSync, readFileSync, readdirSync, statSync, cpSync, writeFileSync,
@@ -3640,8 +3640,14 @@ ipcMain.handle('dialog:attachFiles', async (evt) => {
 // clipboard holds no image (e.g. a normal text paste).
 ipcMain.handle('clipboard:saveImage', async () => {
   try {
-    const img = clipboard.readImage();
-    if (img.isEmpty()) return { ok: false as const, error: 'no image in clipboard' };
+    const items = await clipboard.read();
+    const item = items.find((entry) => entry.types.some((type) => type.startsWith('image/')));
+    const imageType = item?.types.find((type) => type.startsWith('image/'));
+    if (!item || !imageType) return { ok: false as const, error: 'no image in clipboard' };
+    const blob = await item.getType(imageType);
+    if (!(blob instanceof Blob)) return { ok: false as const, error: 'clipboard image has an unsupported format' };
+    const img = nativeImage.createFromBuffer(Buffer.from(await blob.arrayBuffer()));
+    if (img.isEmpty()) return { ok: false as const, error: 'clipboard image is empty' };
     const dir = join(app.getPath('temp'), 'cth-pastes');
     mkdirSync(dir, { recursive: true });
     const name = `paste-${Date.now()}.png`;

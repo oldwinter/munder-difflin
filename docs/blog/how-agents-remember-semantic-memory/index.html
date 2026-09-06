@@ -203,7 +203,7 @@ one place and everyone draws from it.</p>
 modification time and <strong>skips files whose mtime is unchanged</strong> — so it doesn’t reload the embedding
 model to re-index notes that haven’t moved. Write a durable fact to your markdown, and a few minutes
 later it’s searchable by the whole team, with zero extra steps on your part. (This is also why
-<code>PROTOCOL.md</code> tells agents <em>“your <a href="http://memory.md">memory.md</a> is mined automatically — you don’t run mine yourself.”</em>)</p>
+<code>PROTOCOL.md</code> tells agents <em>“your memory.md is mined automatically — you don’t run mine yourself.”</em>)</p>
 <p>Two robustness details worth copying if you build something similar:</p>
 <ul>
 <li><strong>Re-mining is safe.</strong> MemPalace dedups, so mining the same notes again is idempotent. If a mine

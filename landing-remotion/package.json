@@ -2,6 +2,11 @@
   "name": "munder-difflin-landing-remotion",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "npm@12.0.2",
+  "engines": {
+    "node": "26.8.1",
+    "npm": "12.0.2"
+  },
   "description": "Remotion compositions for the Munder Difflin landing page. Renders looping HOW-it-works clips into ../docs/media.",
   "scripts": {
     "studio": "remotion studio",
@@ -17,13 +22,16 @@
     "render:all": "npm run render:agents:webm && npm run render:agents:mp4 && npm run render:mempalace:webm && npm run render:mempalace:mp4 && npm run render:godhive:webm && npm run render:godhive:mp4"
   },
   "dependencies": {
-    "@remotion/cli": "4.0.286",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "remotion": "4.0.286"
+    "@remotion/cli": "4.0.518",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "remotion": "4.0.518"
   },
   "devDependencies": {
-    "@types/react": "^18.3.11",
-    "typescript": "^5.6.3"
+    "@types/react": "^19.2.18",
+    "typescript": "^7.0.2"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true
   }
 }

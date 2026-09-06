@@ -27,19 +27,18 @@ jobs:
           - os: ubuntu-latest
             args: --linux
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 20
+          node-version: 26.8.1
           cache: npm
 
-      # node-gyp (used to rebuild native node-pty) imports distutils, which was
-      # removed in Python 3.12. Pin 3.11 and install setuptools so the distutils
-      # shim is available across all runners.
-      - uses: actions/setup-python@v5
+      - run: npm install --global npm@12.0.2
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: "3.11"
+          python-version: "3.14.7"
 
       - name: Provide distutils for node-gyp
         run: python -m pip install --upgrade setuptools
@@ -92,7 +91,7 @@ jobs:
           cat "SHA256SUMS-${{ matrix.os }}.txt"
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ matrix.os }}-dist
           # zip + latest*.yml + blockmaps feed electron-updater (auto-update):
@@ -114,9 +113,9 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           path: artifacts
 
@@ -128,7 +127,7 @@ jobs:
           ls -la release
 
       - name: Publish to GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@e598afbe1493e6b1bafb1f389cabb956eab91231 # v3.0.3
         with:
           # RELEASE.md is the human-facing notes; GitHub shows it as the body.
           body_path: RELEASE.md
